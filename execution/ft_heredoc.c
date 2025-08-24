@@ -1,0 +1,128 @@
+#include ".././parsing/main.h"
+
+void	init_herdoc_fds(t_command *cmd)
+{
+	t_command *cur;
+
+	cur = cmd;
+	while (cur)
+	{
+		cur->fd_herdoc[0] = -1;
+		cur->fd_herdoc[1] = -1;
+		cur = cur->next_command;
+	}
+}
+
+bool	ft_create_herdoc(t_command *cmd, char *name)
+{
+	char *line;
+
+	if (pipe(cmd->fd_herdoc) == -1)
+	{
+		perror("pipe");
+		return (false);
+	}
+	while (1)
+	{
+		line = readline("> ");
+		if (!line)
+		{
+			ft_putstr_fd("warning: heredoc delimited by EOF\n", 2);
+			break;
+		}
+		if (ft_strcmpp(line, name) == 0)
+		{
+			free(line);
+			break;
+		}
+		ft_putendl_fd(line, cmd->fd_herdoc[1]);
+		free(line);
+	}
+	close_fd(&cmd->fd_herdoc[1]);
+	cmd->fd_herdoc[1] = -1;
+	return (true);
+}
+
+// void	herdoc_read(t_command *cmd, char *name, t_env *env_list, t_red_type type)
+// {
+// 	char	*line;
+
+// 	name = ft_strjoin_2(name, "\n");
+// 	if (!name)
+// 		return ;
+// 	close(cmd->fd_herdoc[0]);
+// 	while (1)
+// 	{
+// 		ft_putstr_fd2("> ", 1);
+// 		line = get_next_line(STDIN_FILENO);
+// 		if (!line)
+// 			break ;
+// 		if (!ft_check_strcmp(line, name))
+// 			break ;
+// 		if (expand == D_HERDOC_Q)
+// 			ft_putstr_fd2(line, cmd->fd_herdoc[1]);
+// 		else
+// 			expand_cmd_heredoc(&line, cmd, cmd->fd_herdoc[1]);
+// 		free(line);
+// 	}
+// 	if (line)
+// 		free(line);
+// 	free(name);
+// 	close(tmp->fd_herdoc[1]);
+// }
+
+// bool	ft_create_herdoc(t_command *cmd, char *name, t_env *env_list, t_red_type type)
+// {
+// 	int	fork_pid;
+
+// 	fork_pid = fork();
+// 	if (fork_pid < 0)
+// 	{
+// 		close_fd(&cmd->fd_herdoc[0]);
+// 		close_fd(&cmd->fd_herdoc[1]);
+// 		return (print_error(errno, NULL, NULL), false);
+// 	}
+// 	if (fork_pid == 0)
+// 	{
+// 		signal(SIGINT, ctlc_handler);
+// 		herdoc_read(cmd, name, env_list, type);
+// 		free_cmd_list(cmd);
+// 		free_list(&env_list);
+// 		exit(0);
+// 	}
+// 	if (fork_pid > 0)
+// 	{
+// 		close_fd(&cmd->fd_herdoc[1]);
+// 		if (wait_and_exit(fork_pid))
+// 			return (false);
+// 	}
+// 	return (true);
+// }
+
+bool	ft_process_heredocs(t_command *cmd)
+{
+	t_command		*tmp;
+	t_redirection	*redi;
+
+	tmp = cmd;
+	init_herdoc_fds(cmd);
+	while (tmp)
+	{
+		redi = tmp->red;
+		while (redi)
+		{
+			if (redi->type == RED_HEREDOC)
+			{
+				if (tmp->fd_herdoc[0] > 0)
+					close_fd(&tmp->fd_herdoc[0]);
+				if (tmp->fd_herdoc[1] > 0)
+					close_fd(&tmp->fd_herdoc[1]);
+				if (!ft_create_herdoc(tmp, redi->name))
+					return (close_fd(&tmp->fd_herdoc[0]), close_fd(&tmp->fd_herdoc[1]), false);
+			}
+			redi = redi->next_red;
+		}
+		tmp = tmp->next_command;
+	}
+	return (true);
+}
