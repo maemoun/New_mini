@@ -22,9 +22,14 @@
 # include <signal.h>
 # include <stdbool.h>
 # include <errno.h>
-#include <fcntl.h>
+# include <fcntl.h>
+# include <sys/wait.h>
 # include "readline/readline.h"
 # include "readline/history.h"
+
+# ifndef BUFFER_SIZE
+#  define BUFFER_SIZE 99
+# endif
 
 typedef enum s_type
 {
@@ -215,13 +220,11 @@ void			ft_signals(void);
 //-----------//herdoc:
 
 void    ft_exec_cmd(t_command *cmd, t_env *env_list);
-bool	ft_process_heredocs(t_command *cmd);
+bool	ft_process_heredocs(t_command *cmd, t_env *env_list);
 void	init_herdoc_fds(t_command *cmd);
-bool	ft_create_herdoc(t_command *cmd, char *name);
-void	close_fd(int *fd);
-int		ft_strcmpp(char *s1, char *s2);
-void	ft_putstr_fd(char *s, int fd);
-void	ft_putendl_fd(char *s, int fd);
+bool	ft_create_herdoc(t_env *env_list, t_command *cmd, char *name, t_red_type type);
+void	herdoc_read(t_command *cmd, char *name, t_env *env_list, t_red_type type);
+char	*get_next_line(int fd);
 
 //-----------//builtin:
 
@@ -247,24 +250,27 @@ void	swap_nodes(t_env *node1, t_env *node2);
 bool    ft_handle_redirection(t_command *cmd);
 bool	set_input(t_command *cmd, t_redirection *red_in);
 bool	set_output(t_command *cmd, t_redirection *red_out);
-void	print_error(int error_nb, char *message, char *cmd);
-void	file_error(int error_nb, char *message, char *cmd);
-void	ft_putstr_fd(char *s, int fd);
-void	ft_putchar_fd(char c, int fd);
 bool	duplicate_std_fds(t_command *cmd);
 bool	restore_std_input(t_command *cmd);
+void	list_add_back(t_env **env_list, t_env *new);
+t_env	*list_new_node(char *value, char *key, bool eg);
+
+//-----------//print:
+
+void	print_error(int error_nb, char *message, char *cmd);
+void	file_error(int error_nb, char *message, char *cmd);
+
+//-----------//utils:
+
+void	close_fd(int *fd);
+void	ft_putendl_fd(char *s, int fd);
+void	ft_putchar_fd(char c, int fd);
 int		ft_check_strcmp(const char *s1, const char *s2);
-int		ft_exit_status(int status);
 void	ft_putstr_fd2(char *s, int fd);
 int		ft_strncmp_2(const char *s1, const char *s2, size_t n);
 int		ft_strlen_2(const char *s);
 char	*ft_strjoin_2(char const *s1, char const *s2);
 char	*ft_strdup_2(const char *s1);
-void	list_add_back(t_env **env_list, t_env *new);
-t_env	*list_new_node(char *value, char *key, bool eg);
-
-//-----------//utils:
-
 int		ft_isdigit(int c);
 int		ft_atoi(const char *str);
 char	*ft_substr_2(char const *s, unsigned int start, size_t len);
@@ -273,6 +279,7 @@ int		ft_isalnum_2(int c);
 
 //-----------//exit:
 
+int		ft_exit_status(int status);
 void	cleanup_shell(t_command *cmd, t_env *env_list);
 void	free_cmd_list(t_command *cmd);
 void	free_cmd_node(t_command *cmd);
@@ -283,5 +290,8 @@ void	clear_all_pipes(t_command *cmd);
 bool	wait_and_exit(int last_pid);
 int		status_scan(int *status);
 
+//-------------//signals:
+
+void	ctlc_handler(int sig);
 
 #endif

@@ -49,6 +49,7 @@ SRC     := main.c \
 		   ./execution/builtins/built_unset.c \
 		   ./execution/builtins/built_export.c \
 		   ./execution/builtins/ft_export_utils.c \
+		   ./execution/ft_get_next_line.c \
 		   #print.c
 
 OBJ     := $(SRC:.c=.o)
