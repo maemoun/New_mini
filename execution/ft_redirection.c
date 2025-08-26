@@ -1,5 +1,21 @@
 #include ".././parsing/main.h"
 
+bool	setup_pipes(t_command *cmd)
+{
+	if (cmd->fd_cmd[1] != STDOUT_FILENO && cmd->fd_pipe[1] > 0)
+	{
+		close(cmd->fd_pipe[1]);
+		cmd->fd_pipe[1] = -1;
+	}
+	else if (cmd->fd_cmd[1] == STDOUT_FILENO && cmd->next_command && cmd->fd_pipe[1] > 0)
+		cmd->fd_cmd[1] = cmd->fd_pipe[1];
+	if (cmd->prev && cmd->fd_cmd[0] == STDIN_FILENO)
+		cmd->fd_cmd[0] = cmd->fd_pipe[0];
+	if (cmd->fd_pipe[0] > 0)
+		close(cmd->fd_pipe[0]);
+	return (true);
+}
+
 bool	duplicate_std_fds(t_command *cmd)
 {
 	if (cmd->fd_cmd[0] != STDIN_FILENO)

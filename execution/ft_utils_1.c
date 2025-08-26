@@ -179,3 +179,19 @@ char	*ft_substr_2(char const *s, unsigned int start, size_t len)
 	ma[b] = '\0';
 	return (ma);
 }
+
+char	*ft_strchr_2(const char *s, int c)
+{
+	size_t	x;
+
+	x = 0;
+	while (s[x])
+	{
+		if (s[x] == (char)c)
+			return ((char *)s + x);
+		x++;
+	}
+	if (s[x] == (char)c)
+		return ((char *)s + x);
+	return (NULL);
+}

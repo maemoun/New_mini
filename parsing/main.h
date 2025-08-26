@@ -24,6 +24,7 @@
 # include <errno.h>
 # include <fcntl.h>
 # include <sys/wait.h>
+# include <sys/stat.h>
 # include "readline/readline.h"
 # include "readline/history.h"
 
@@ -94,6 +95,7 @@ typedef struct s_command
 	int						fd_cmd[2];
 	int						fd_pipe[2];
 	struct s_command		*next_command;
+	struct s_command		*prev;
 } t_command;
 
 typedef struct s_env
@@ -276,6 +278,8 @@ int		ft_atoi(const char *str);
 char	*ft_substr_2(char const *s, unsigned int start, size_t len);
 int		ft_isalpha_2(int c);
 int		ft_isalnum_2(int c);
+char	*ft_strchr_2(const char *s, int c);
+char	**ft_split(const char *s, char c);
 
 //-----------//exit:
 
@@ -292,6 +296,14 @@ int		status_scan(int *status);
 
 //-------------//signals:
 
+void	ft_signals(void);
 void	ctlc_handler(int sig);
+void	ft_signals_child(void);
+
+//------------//excute_cmd:
+
+void	execute_cmd(t_command *cmd, t_env *env_list);
+void	child_process(t_env *env_list, t_command *cmd);
+bool	setup_pipes(t_command *cmd);
 
 #endif

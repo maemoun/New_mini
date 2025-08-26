@@ -122,3 +122,5 @@ COMMAND 1:
 
 valgrind --leak-check=full ./minishel
 
+
+ls | grep execution/

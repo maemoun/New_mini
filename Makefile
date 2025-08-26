@@ -50,6 +50,9 @@ SRC     := main.c \
 		   ./execution/builtins/built_export.c \
 		   ./execution/builtins/ft_export_utils.c \
 		   ./execution/ft_get_next_line.c \
+		   ./execution/execute_cmd.c \
+		   ./execution/ft_split.c \
+		   ./execution/ft_signals.c \
 		   #print.c
 
 OBJ     := $(SRC:.c=.o)

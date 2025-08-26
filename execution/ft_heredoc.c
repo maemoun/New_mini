@@ -9,6 +9,11 @@ void	init_herdoc_fds(t_command *cmd)
 	{
 		cur->fd_herdoc[0] = -1;
 		cur->fd_herdoc[1] = -1;
+		cur->fd_cmd[0] = -1;
+		cur->fd_cmd[1] = -1;
+		cur->fd_pipe[0] = -1;
+		cur->fd_pipe[1] = -1;
+		// cur->prev = cur;
 		cur = cur->next_command;
 	}
 }
@@ -28,7 +33,11 @@ void	herdoc_read(t_command *cmd, char *name, t_env *env_list, t_red_type type)
 		if (!line)
 			break ;
 		if (!ft_check_strcmp(line, name))
+		{
+			free(line);
+			line = NULL;
 			break ;
+		}
 		// if (type == D_HERDOC_Q)
 			ft_putstr_fd2(line, cmd->fd_herdoc[1]);
 		// else
@@ -40,6 +49,7 @@ void	herdoc_read(t_command *cmd, char *name, t_env *env_list, t_red_type type)
 	free(name);
 	close(cmd->fd_herdoc[1]);
 }
+
 
 bool	ft_create_herdoc(t_env *env_list, t_command *cmd, char *name, t_red_type type)
 {

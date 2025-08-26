@@ -13,8 +13,8 @@ bool	restore_std_input(t_command *cmd)
 
 void    ft_exec_cmd(t_command *cmd, t_env *env_list)
 {
-	if (!ft_process_heredocs(cmd, env_list));
-		return ;
+	// if (!ft_process_heredocs(cmd, env_list));
+	// 	return ;
 	if (is_builtin(cmd->command[0]) && !cmd->next_command)
 	{
 		init_std_back(cmd);
@@ -25,6 +25,9 @@ void    ft_exec_cmd(t_command *cmd, t_env *env_list)
 		execute_builtin(cmd->command, cmd, env_list);
 		init_std_back(cmd);
 	}
-	// else
-	// 	execute_cmd(cmd);
+	else
+	{
+		init_herdoc_fds(cmd);
+		execute_cmd(cmd, env_list);
+	}
 }
