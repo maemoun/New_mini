@@ -75,6 +75,7 @@ typedef enum s_red_type
 	INPUT,
 	OUTPUT,
 	RED_HEREDOC,
+	// RED_HEREDOC_Q,
 	RED_APPEND
 }	t_red_type;
 

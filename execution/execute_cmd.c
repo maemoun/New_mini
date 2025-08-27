@@ -207,8 +207,6 @@ void	execute_cmd(t_command *cmd, t_env *env_list)
 		}
 		// if (fork_pid > 0)
 		// 	parent_process(list);
-
-		
 		list = list->next_command;
 	}
 	wait_and_exit(fork_pid);
